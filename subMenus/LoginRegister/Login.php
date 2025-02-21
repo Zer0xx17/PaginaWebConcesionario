@@ -1,8 +1,84 @@
 <?php
+
+session_start();
+
 if (isset($_GET['dato'])) {
     $dato = $_GET['dato'];
 }
+
+// Variables para los mensajes
+$mensajeConfirmacion = "";
+$mensajeError = "";
+$mensajeErrorLogin = "";
+
+// Procesar el formulario de login
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['DNIEntrar']) && isset($_POST['passwordEntrar']) && !isset($_POST['anadir'])) {
+  // Recoger y limpiar datos del login
+  $dniEntrar = trim($_POST['DNIEntrar']);
+  $passwordEntrar = sha1(trim($_POST['passwordEntrar'])); // Se usa sha1 para cifrar la contraseña
+
+  // Conexión a la base de datos
+  $conexion = mysqli_connect("localhost", "root", "rootroot", "concesionario");
+  if (!$conexion) {
+      die("Error al conectar con el servidor: " . mysqli_connect_error());
+  }
+  
+  // Consulta para verificar que el usuario exista
+  $queryLogin = "SELECT * FROM usuarios WHERE dni='$dniEntrar' AND password='$passwordEntrar'";
+  $resultadoLogin = mysqli_query($conexion, $queryLogin);
+  
+  if (mysqli_num_rows($resultadoLogin) > 0) {
+      $usuario = mysqli_fetch_assoc($resultadoLogin);
+
+      // Guardar datos del usuario en la sesión
+      $_SESSION['usuario'] = [
+          'nombre' => $usuario['nombre'],
+          'dni' => $usuario['dni'],
+          'tipoUsuario' => $usuario['apellidos'] // O el campo que use para diferenciar roles
+      ];
+
+      // Redirigir a index.php
+      header("Location: ../../index.php");
+      exit();
+  } else {
+      $mensajeErrorLogin = "Credenciales incorrectas.";
+  }
+
+  mysqli_close($conexion);
+}
+
+// Procesar el formulario de registro
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
+    // Recoger y limpiar datos del registro
+    $nombre      = trim($_POST['nombre']);
+    $dni         = trim($_POST['DNI']);
+    $password    = sha1(trim($_POST['password'])); // Utiliza sha1 para cifrar la contraseña 
+    $tipoUsuario = trim($_POST['tipoUsuario']);
+
+    if (!empty($nombre) && !empty($dni) && !empty($password) && !empty($tipoUsuario)) {
+        // Conexión a la base de datos
+        $conexion = mysqli_connect("localhost", "root", "rootroot", "concesionario");
+        if (!$conexion) {
+            die("Error al conectar con el servidor: " . mysqli_connect_error());
+        }
+
+        // Insertar en la tabla "usuarios"
+        $query = "INSERT INTO usuarios (nombre, dni, password, apellidos) 
+                  VALUES ('$nombre', '$dni', '$password', '$tipoUsuario')";
+
+        if (mysqli_query($conexion, $query)) {
+            $mensajeConfirmacion = "Usuario registrado exitosamente.";
+        } else {
+            $mensajeError = "Error al registrar el usuario: " . mysqli_error($conexion);
+        }
+
+        mysqli_close($conexion);
+    } else {
+        $mensajeError = "Por favor, rellena todos los campos requeridos.";
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -40,9 +116,12 @@ if (isset($_GET['dato'])) {
       color: #20add8;
       font-family: "Verdana", sans-serif;
     }
-    nav a:hover, nav ul li ul a:hover {
+    /* Efecto hover en los enlaces del menú */
+    nav a:hover,
+    nav ul li ul a:hover {
       background-color: #575757;
     }
+
     nav ul li ul {
       display: none;
       position: absolute;
@@ -56,7 +135,6 @@ if (isset($_GET['dato'])) {
     nav ul li ul a {
       color: #fff;
     }
-    /* Menú desplegable hacia la izquierda */
     .submenu-izquierda {
       display: none;
       position: absolute;
@@ -85,7 +163,7 @@ if (isset($_GET['dato'])) {
     .contenedor-imagen:hover .submenu-izquierda {
       display: block;
     }
-    
+
     /* -------------------- Estilos para Login & Registro -------------------- */
     html, body {
       height: 100%;
@@ -122,7 +200,7 @@ if (isset($_GET['dato'])) {
     }
     .card-side::before {
       position: absolute;
-      content: 'Log in';
+      content: 'Entrar';
       left: -70px;
       top: 0;
       width: 100px;
@@ -140,7 +218,7 @@ if (isset($_GET['dato'])) {
       color: var(--font-color);
       font-weight: 600;
     }
-    .toggle {
+    .giro {
       opacity: 0;
       width: 0;
       height: 0;
@@ -173,16 +251,16 @@ if (isset($_GET['dato'])) {
       box-shadow: 0 3px 0 var(--main-color);
       transition: 0.3s;
     }
-    .toggle:checked + .slider {
+    .giro:checked + .slider {
       background-color: var(--input-focus);
     }
-    .toggle:checked + .slider:before {
+    .giro:checked + .slider:before {
       transform: translateX(30px);
     }
-    .toggle:checked ~ .card-side:before {
+    .giro:checked ~ .card-side:before {
       text-decoration: none;
     }
-    .toggle:checked ~ .card-side:after {
+    .giro:checked ~ .card-side:after {
       text-decoration: underline;
     }
     /* Flip Card */
@@ -196,10 +274,10 @@ if (isset($_GET['dato'])) {
       transition: transform 0.8s;
       transform-style: preserve-3d;
     }
-    .toggle:checked ~ .flip-card__inner {
+    .giro:checked ~ .flip-card__inner {
       transform: rotateY(180deg);
     }
-    .toggle:checked ~ .flip-card__front {
+    .giro:checked ~ .flip-card__front {
       box-shadow: none;
     }
     .flip-card__front, .flip-card__back {
@@ -270,6 +348,13 @@ if (isset($_GET['dato'])) {
       color: var(--font-color);
       cursor: pointer;
     }
+
+    /* -------------------- Quitar el hover/sombra en la imagen de Inicio Sesión -------------------- */
+    .contenedor-imagen a:hover {
+      background-color: transparent !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
   </style>
 </head>
 <body>
@@ -310,9 +395,8 @@ if (isset($_GET['dato'])) {
     </ul>
     <div class="contenedor-imagen" style="margin-left: auto;">
       <a href="../../subMenus/LoginRegister/Login.php">
-        <img src="img-Internas/InicioSesion.png" alt="Inicio Sesión" height="60px">
+        <img src="../../img-Internas/InicioS.png" alt="Inicio Sesión" height="60px">
       </a>
-      </div>
     </div>
   </nav>
   
@@ -321,43 +405,75 @@ if (isset($_GET['dato'])) {
     <div class="wrapper">
       <div class="card-switch">
         <label class="switch">
-          <input type="checkbox" class="toggle" <?php echo (isset($dato) && $dato === 'Registro' ? 'checked' : ''); ?>> 
+          <!-- Si hay mensaje de confirmación se fuerza a iniciar con el checkbox "checked" (panel Registrate) para luego ejecutar la animación -->
+          <input type="checkbox" class="giro" 
+            <?php echo (!empty($mensajeConfirmacion) ? 'checked' : (isset($dato) && $dato === 'Registro' ? 'checked' : '')); ?>>
           <span class="slider"></span>
           <span class="card-side"></span>
           <div class="flip-card__inner">
+            <!-- =================== Panel Login =================== -->
             <div class="flip-card__front">
-              <div class="title">Log in</div>
-              <form class="flip-card__form" action="">
-                <input class="flip-card__input" name="email" placeholder="Email" type="email" required>
-                <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-                <button class="flip-card__btn">Let`s go!</button>
+              <div class="title">Entrar</div>
+              <form class="flip-card__form" action="" method="POST">
+                <input class="flip-card__input" name="DNIEntrar" placeholder="DNI" type="text" required 
+                       minlength="8" pattern="^(?=.{8,}$)\d+[A-Za-z]$" 
+                       title="El DNI debe tener al menos 8 caracteres y terminar en una letra">
+                <input class="flip-card__input" name="passwordEntrar" placeholder="Contraseña" type="password" required>
+                <button class="flip-card__btn" type="submit">Let`s go!</button>
               </form>
+              <?php if (!empty($mensajeErrorLogin)): ?>
+                  <p style="color:red;"><?php echo $mensajeErrorLogin; ?></p>
+              <?php endif; ?>
             </div>
+
+            <!-- =================== Panel Registro =================== -->
             <div class="flip-card__back">
               <div class="title">Registrate</div>
-              <form class="flip-card__form" action="">
-                <input class="flip-card__input" placeholder="Nombre" type="Nombre" required>
-                <input class="flip-card__input" name="DNI" placeholder="DNI" type="DNI" required>
-                <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-
+              <form class="flip-card__form" action="" method="POST">
+                <input class="flip-card__input" name="nombre" placeholder="Nombre" type="text" required>
+                <input class="flip-card__input" name="DNI" placeholder="DNI" type="text" required 
+                       minlength="8" pattern="^(?=.{8,}$)\d+[A-Za-z]$" 
+                       title="El DNI debe tener al menos 8 caracteres y terminar en una letra">
+                <input class="flip-card__input" name="password" placeholder="Contraseña" type="password" required>
+                
                 <div class="user-type">
-      <label class="user-option">
-        <input type="radio" name="user_type" value="Comprador">
-        <span>Comprador</span>
-      </label>
-      <label class="user-option">
-        <input type="radio" name="user_type" value="Vendedor">
-        <span>Vendedor</span>
-      </label>
-    </div>
-    
-                <button class="flip-card__btn">Confirm!</button>
+                  <label class="user-option">
+                    <input type="radio" name="tipoUsuario" value="Comprador" required> 
+                    <span>Comprador</span>
+                  </label>
+                  <label class="user-option">
+                    <input type="radio" name="tipoUsuario" value="Vendedor">
+                    <span>Vendedor</span>
+                  </label>
+                </div>
+                <button class="flip-card__btn" type="submit" name="anadir">Confirm!</button>
               </form>
+
+              <!-- Mostrar mensajes de registro -->
+              <?php if (!empty($mensajeConfirmacion)): ?>
+                  <p style="color:green;"><?php echo $mensajeConfirmacion; ?></p>
+              <?php endif; ?>
+
+              <?php if (!empty($mensajeError)): ?>
+                  <p style="color:red;"><?php echo $mensajeError; ?></p>
+              <?php endif; ?>
             </div>
           </div>
         </label>
       </div>
     </div>
   </div>
+  
+  <!-- Script para ejecutar la animación de flip (de Registrate a Log in) -->
+  <?php if (!empty($mensajeConfirmacion)): ?>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Después de 2 segundos se desmarca el checkbox, lo que activa la transición a Log in
+      setTimeout(function(){
+        document.querySelector('.giro').checked = false;
+      }, 2000);
+    });
+  </script>
+  <?php endif; ?>
 </body>
 </html>
