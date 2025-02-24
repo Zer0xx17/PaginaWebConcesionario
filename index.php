@@ -1,17 +1,14 @@
 <?php
 session_start();
 
-// Si se envía el formulario de logout, se destruye la sesión y se redirige
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Se obtiene el usuario si existe
 $usuario = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
 
-// Función para comparar el tipo de usuario de forma insensible a mayúsculas
 function esTipo($usuario, $tipo) {
     return isset($usuario['tipoUsuario']) && strcasecmp($usuario['tipoUsuario'], $tipo) === 0;
 }
@@ -97,7 +94,6 @@ function esTipo($usuario, $tipo) {
         #contenedor-formulario button:hover {
             background-color: #575757;
         }
-        /* Estilo del menú desplegable hacia la izquierda */
         .submenu-izquierda {
             display: none;
             position: absolute;
@@ -163,7 +159,7 @@ function esTipo($usuario, $tipo) {
                         <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
                         <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
                     <?php endif; ?>
-                </ul>
+                </ul>   
             </li>
             <!-- Menú USUARIOS -->
             <li>
@@ -185,8 +181,8 @@ function esTipo($usuario, $tipo) {
                 <a href="#">ALQUILERES</a>
                 <ul>
                     <?php if ($usuario): ?>
-                        <li><a href="?opcion=Listar">Listar</a></li>
-                        <li><a href="?opcion=Borrar">Borrar</a></li>
+                        <li><a href="submenus/alquileres/ListarAlquiler.php">Listar</a></li>
+                        <li><a href="submenus/alquileres/BorrarAlquiler.php">Borrar</a></li>
                     <?php else: ?>
                         <li><span>Inicia sesión para acceder a este apartado</span></li>
                     <?php endif; ?>
