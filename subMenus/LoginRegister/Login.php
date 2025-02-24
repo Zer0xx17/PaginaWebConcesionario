@@ -6,38 +6,31 @@ if (isset($_GET['dato'])) {
     $dato = $_GET['dato'];
 }
 
-// Variables para los mensajes
 $mensajeConfirmacion = "";
 $mensajeError = "";
 $mensajeErrorLogin = "";
 
-// Procesar el formulario de login
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['DNIEntrar']) && isset($_POST['passwordEntrar']) && !isset($_POST['anadir'])) {
-  // Recoger y limpiar datos del login
   $dniEntrar = trim($_POST['DNIEntrar']);
-  $passwordEntrar = sha1(trim($_POST['passwordEntrar'])); // Se usa sha1 para cifrar la contraseña
+  $passwordEntrar = sha1(trim($_POST['passwordEntrar'])); 
 
-  // Conexión a la base de datos
   $conexion = mysqli_connect("localhost", "root", "rootroot", "concesionario");
   if (!$conexion) {
       die("Error al conectar con el servidor: " . mysqli_connect_error());
   }
   
-  // Consulta para verificar que el usuario exista
   $queryLogin = "SELECT * FROM usuarios WHERE dni='$dniEntrar' AND password='$passwordEntrar'";
   $resultadoLogin = mysqli_query($conexion, $queryLogin);
   
   if (mysqli_num_rows($resultadoLogin) > 0) {
       $usuario = mysqli_fetch_assoc($resultadoLogin);
 
-      // Guardar datos del usuario en la sesión
       $_SESSION['usuario'] = [
           'nombre' => $usuario['nombre'],
           'dni' => $usuario['dni'],
-          'tipoUsuario' => $usuario['apellidos'] // O el campo que use para diferenciar roles
+          'tipoUsuario' => $usuario['apellidos']
       ];
 
-      // Redirigir a index.php
       header("Location: ../../index.php");
       exit();
   } else {
@@ -47,22 +40,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['DNIEntrar']) && isset(
   mysqli_close($conexion);
 }
 
-// Procesar el formulario de registro
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
-    // Recoger y limpiar datos del registro
     $nombre      = trim($_POST['nombre']);
     $dni         = trim($_POST['DNI']);
-    $password    = sha1(trim($_POST['password'])); // Utiliza sha1 para cifrar la contraseña 
+    $password    = sha1(trim($_POST['password'])); 
     $tipoUsuario = trim($_POST['tipoUsuario']);
 
     if (!empty($nombre) && !empty($dni) && !empty($password) && !empty($tipoUsuario)) {
-        // Conexión a la base de datos
         $conexion = mysqli_connect("localhost", "root", "rootroot", "concesionario");
         if (!$conexion) {
             die("Error al conectar con el servidor: " . mysqli_connect_error());
         }
 
-        // Insertar en la tabla "usuarios"
         $query = "INSERT INTO usuarios (nombre, dni, password, apellidos) 
                   VALUES ('$nombre', '$dni', '$password', '$tipoUsuario')";
 
@@ -88,7 +77,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
   <title>Registro & Login</title>
   <link rel="icon" href="img-Internas/favicon.ico" type="image/x-icon">
   <style>
-    /* -------------------- Estilos de la Barra Superior -------------------- */
     nav {
       display: flex;
       align-items: center;
@@ -116,7 +104,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
       color: #20add8;
       font-family: "Verdana", sans-serif;
     }
-    /* Efecto hover en los enlaces del menú */
     nav a:hover,
     nav ul li ul a:hover {
       background-color: #575757;
@@ -164,7 +151,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
       display: block;
     }
 
-    /* -------------------- Estilos para Login & Registro -------------------- */
     html, body {
       height: 100%;
       margin: 0;
@@ -187,7 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
       --bg-color-alt: #666;
       --main-color: #323232;
     }
-    /* Card Switch */
     .switch {
       position: relative;
       display: flex;
@@ -349,7 +334,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
       cursor: pointer;
     }
 
-    /* -------------------- Quitar el hover/sombra en la imagen de Inicio Sesión -------------------- */
     .contenedor-imagen a:hover {
       background-color: transparent !important;
       box-shadow: none !important;
@@ -358,7 +342,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
   </style>
 </head>
 <body>
-  <!-- =================== Barra Superior =================== -->
   <nav>
     <img src="../../img-Internas/logo.png" alt="Logo" height="100px">
     <ul>
@@ -400,18 +383,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
     </div>
   </nav>
   
-  <!-- =================== Contenido de Login & Registro =================== -->
   <div class="container">
     <div class="wrapper">
       <div class="card-switch">
         <label class="switch">
-          <!-- Si hay mensaje de confirmación se fuerza a iniciar con el checkbox "checked" (panel Registrate) para luego ejecutar la animación -->
           <input type="checkbox" class="giro" 
             <?php echo (!empty($mensajeConfirmacion) ? 'checked' : (isset($dato) && $dato === 'Registro' ? 'checked' : '')); ?>>
           <span class="slider"></span>
           <span class="card-side"></span>
           <div class="flip-card__inner">
-            <!-- =================== Panel Login =================== -->
             <div class="flip-card__front">
               <div class="title">Entrar</div>
               <form class="flip-card__form" action="" method="POST">
@@ -426,7 +406,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
               <?php endif; ?>
             </div>
 
-            <!-- =================== Panel Registro =================== -->
             <div class="flip-card__back">
               <div class="title">Registrate</div>
               <form class="flip-card__form" action="" method="POST">
@@ -449,7 +428,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
                 <button class="flip-card__btn" type="submit" name="anadir">Confirm!</button>
               </form>
 
-              <!-- Mostrar mensajes de registro -->
               <?php if (!empty($mensajeConfirmacion)): ?>
                   <p style="color:green;"><?php echo $mensajeConfirmacion; ?></p>
               <?php endif; ?>
@@ -464,11 +442,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
     </div>
   </div>
   
-  <!-- Script para ejecutar la animación de flip (de Registrate a Log in) -->
   <?php if (!empty($mensajeConfirmacion)): ?>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Después de 2 segundos se desmarca el checkbox, lo que activa la transición a Log in
       setTimeout(function(){
         document.querySelector('.giro').checked = false;
       }, 2000);
