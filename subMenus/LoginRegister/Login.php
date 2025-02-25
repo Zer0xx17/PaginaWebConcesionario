@@ -26,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['DNIEntrar']) && isset(
       $usuario = mysqli_fetch_assoc($resultadoLogin);
 
       $_SESSION['usuario'] = [
+        'id_usuario' => $usuario['id_usuario'], 
           'nombre' => $usuario['nombre'],
           'dni' => $usuario['dni'],
           'tipoUsuario' => $usuario['apellidos']
@@ -349,30 +350,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['anadir'])) {
         <a href="#">COCHES</a>
         <ul>
           <li><a href="../../index.php">Inicio</a></li>
-          <li><a href="../../submenus/coches/AñadirCoches.php">Añadir</a></li>
           <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
           <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
-          <li><a href="../../submenus/coches/ModificarCoches.php">Modificar</a></li>
-          <li><a href="../../submenus/coches/BorrarCoches.php">Borrar</a></li>
+
         </ul>
       </li>
       <li>
         <a href="#">USUARIOS</a>
         <ul>
-          <li><a href="../../index.php">Inicio</a></li>
-          <li><a href="../../submenus/usuarios/AñadirUsuarios.php">Añadir</a></li>
-          <li><a href="../../submenus/usuarios/ListarUsuarios.php">Listar</a></li>
-          <li><a href="../../submenus/usuarios/BuscarUsuarios.php">Buscar</a></li>
-          <li><a href="../../submenus/usuarios/ModificarUsuarios.php">Modificar</a></li>
-          <li><a href="../../submenus/usuarios/BorrarUsuarios.php">Borrar</a></li>
+        <li><span>Inicia sesión para acceder a este apartado</span></li>
         </ul>
       </li>
       <li>
         <a href="#">ALQUILERES</a>
         <ul>
-          <li><a href="../../index.php">Inicio</a></li>
-          <li><a href="../../alquileres/ListarAlquiler.php">Listar</a></li>
-          <li><a href="../../alquileres/BorrarAlquiler.php">Borrar</a></li>
+        <li><span>Inicia sesión para acceder a este apartado</span></li>
         </ul>
       </li>
     </ul>

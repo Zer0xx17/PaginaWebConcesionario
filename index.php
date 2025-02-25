@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -12,6 +13,7 @@ $usuario = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
 function esTipo($usuario, $tipo) {
     return isset($usuario['tipoUsuario']) && strcasecmp($usuario['tipoUsuario'], $tipo) === 0;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -141,25 +143,32 @@ function esTipo($usuario, $tipo) {
     <nav>
         <img src="img-Internas/logo.png" alt="Logo" height="100px">
         <ul>
-            <!-- Menú COCHES -->
-            <li>
-                <a href="#">COCHES</a>
-                <ul>
-                    <?php if ($usuario && (esTipo($usuario, 'administrador') || esTipo($usuario, 'vendedor'))): ?>
-                        <li><a href="submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
-                        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
-                        <li><a href="submenus/coches/ModificarCoches.php">Modificar</a></li>
-                        <li><a href="submenus/coches/BorrarCoches.php">Borrar</a></li>
-                    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
-                        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
-                    <?php else: ?>
-                        <!-- Opciones para usuarios no autenticados -->
-                        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
-                    <?php endif; ?>
-                </ul>   
+
+        <!-- Menú COCHES -->
+      <li>
+     <a href="#">COCHES</a>
+    <ul>
+    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
+        <li><a href="submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
+        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
+        <li><a href="submenus/coches/ModificarCoches.php">Modificar</a></li>
+        <li><a href="submenus/coches/BorrarCoches.php">Borrar</a></li>
+    <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
+        <li><a href="submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
+        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
+        <li><a href="submenus/coches/ModificarCoches.php">Modificar</a></li>
+    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
+        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
+    <?php else: ?>
+        <!-- Opciones para usuarios no autenticados -->
+        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
+    <?php endif; ?>
+</ul>
+   
             </li>
             <!-- Menú USUARIOS -->
             <li>
@@ -176,19 +185,31 @@ function esTipo($usuario, $tipo) {
                     <?php endif; ?>
                 </ul>
             </li>
-            <!-- Menú ALQUILERES -->
+             <!-- Menú ALQUILERES -->
             <li>
                 <a href="#">ALQUILERES</a>
                 <ul>
-                    <?php if ($usuario): ?>
+                        
+                    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
                         <li><a href="submenus/alquileres/ListarAlquiler.php">Listar</a></li>
                         <li><a href="submenus/alquileres/BorrarAlquiler.php">Borrar</a></li>
-                    <?php else: ?>
-                        <li><span>Inicia sesión para acceder a este apartado</span></li>
+                        <li><a href="submenus/alquileres/DevolverAlquiler.php">Devolver Alquiler</a></li>
+                            <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
+                        <li><a href="submenus/alquileres/ListarAlquiler.php">Listar</a></li>
+                        <li><a href="submenus/alquileres/BorrarAlquiler.php">Borrar</a></li>
+                            <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
+                        <li><a href="submenus/alquileres/ListarAlquiler.php">Listar</a></li>
+                        <li><a href="submenus/alquileres/DevolverAlquiler.php">Devolver</a></li>
+                            <?php else: ?>
+                                <li><span>Inicia sesión para acceder a este apartado</span></li>
                     <?php endif; ?>
                 </ul>
             </li>
         </ul>
+
+
+
+                 
         
         <!-- Zona de inicio de sesión / usuario -->
         <?php if ($usuario): ?>

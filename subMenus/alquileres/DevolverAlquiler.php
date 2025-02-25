@@ -141,29 +141,29 @@ nav ul li ul a {
     <nav>
         <img src="../../img-Internas/logo.png" alt="Logo" height="100px">
         <ul>
-                       <!-- Menú COCHES -->
-                       <li>
+            <!-- Menú COCHES -->
+            <li>
                 <a href="#">COCHES</a>
                 <ul>
-    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
-        <li><a href="../coches/AñadirCoches.php">Añadir alquileres</a></li>
-        <li><a href="../coches/ListarCoches.php">Listar</a></li>
-        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
-        <li><a href="../coches/ModificarCoches.php">Modificar</a></li>
-        <li><a href="../coches/BorrarCoches.php">Borrar</a></li>
-    <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
-        <li><a href="../coches/AñadirCoches.php">Añadir alquileres</a></li>
-        <li><a href="../coches/ListarCoches.php">Listar</a></li>
-        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
-        <li><a href="../coches/ModificarCoches.php">Modificar</a></li>
-    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
-        <li><a href="../coches/ListarCoches.php">Listar</a></li>
-        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
-    <?php else: ?>
-        <!-- Opciones para usuarios no autenticados -->
-        <li><a href="../ListarCoches.php">Listar</a></li>
-        <li><a href="../BuscarCoches.php">Buscar</a></li>
-    <?php endif; ?>
+                    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
+                        <li><a href="../coches/AñadirCoches.php">Añadir alquileres</a></li>
+                        <li><a href="../coches/ListarCoches.php">Listar</a></li>
+                        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
+                        <li><a href="../coches/ModificarCoches.php">Modificar</a></li>
+                        <li><a href="../coches/BorrarCoches.php">Borrar</a></li>
+                    <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
+                        <li><a href="../coches/AñadirCoches.php">Añadir alquileres</a></li>
+                        <li><a href="../coches/ListarCoches.php">Listar</a></li>
+                        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
+                        <li><a href="../coches/ModificarCoches.php">Modificar</a></li>
+                    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
+                        <li><a href="../coches/ListarCoches.php">Listar</a></li>
+                        <li><a href="../coches/BuscarCoches.php">Buscar</a></li>
+                    <?php else: ?>
+                        <!-- Opciones para usuarios no autenticados -->
+                        <li><a href="../ListarCoches.php">Listar</a></li>
+                        <li><a href="../BuscarCoches.php">Buscar</a></li>
+                    <?php endif; ?>
                 </ul>  
             </li>
             <!-- Menú USUARIOS -->
@@ -182,26 +182,23 @@ nav ul li ul a {
                     <?php endif; ?>
                 </ul>
             </li>
-                        <!-- Menú ALQUILERES -->
-                        <li>
+            <!-- Menú ALQUILERES -->
+            <li>
                 <a href="#">ALQUILERES</a>
                 <ul>
-                        
+                    <li><a href="../../index.php">Inicio</a></li>
                     <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
-                        <li><a href="../../index.php">Inicio</a></li>
                         <li><a href="ListarAlquiler.php">Listar</a></li>
                         <li><a href="BorrarAlquiler.php">Borrar</a></li>
                         <li><a href="DevolverAlquiler.php">Devolver Alquiler</a></li>
-                            <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
-                                <li><a href="../../index.php">Inicio</a></li>
+                    <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
                         <li><a href="ListarAlquiler.php">Listar</a></li>
                         <li><a href="BorrarAlquiler.php">Borrar</a></li>
-                            <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
-                                <li><a href="../../index.php">Inicio</a></li>
+                    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
                         <li><a href="ListarAlquiler.php">Listar</a></li>
                         <li><a href="DevolverAlquiler.php">Devolver</a></li>
-                            <?php else: ?>
-                                <li><span>Inicia sesión para acceder a este apartado</span></li>
+                    <?php else: ?>
+                        <li><span>Inicia sesión para acceder a este apartado</span></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -258,15 +255,19 @@ nav ul li ul a {
     }
 
     $nombreTabla = "coches";
-
     $marca = '';
     $modelo = '';
 
-    if (isset($_REQUEST['borrar']) && isset($_REQUEST['delete_ids']) && is_array($_REQUEST['delete_ids'])) {
+    if (isset($_REQUEST['alquilar']) && isset($_REQUEST['delete_ids']) && is_array($_REQUEST['delete_ids'])) {
+        $fechaActual = date("Y-m-d");
+        
         foreach ($_REQUEST['delete_ids'] as $id) {
             $id = (int)$id; 
-            $deleteQuery = "DELETE FROM $nombreTabla WHERE id_coche = $id";
-            mysqli_query($conexion, $deleteQuery);
+            $updateQuery = "UPDATE coches SET alquilado = '0' WHERE id_coche = $id";
+            mysqli_query($conexion, $updateQuery);
+            
+            $updateQueryAlquiler = "UPDATE alquileres SET devuelto = '$fechaActual' WHERE id_coche = $id";
+            mysqli_query($conexion, $updateQueryAlquiler);
         }
     }
 
@@ -274,16 +275,22 @@ nav ul li ul a {
     $posLeft = "37%";
 
     print ("<table style='position:absolute; top:$posTop; left:$posLeft; background-color:rgba(128, 128, 128, 0.7); border:2px solid black; border-radius:10px; width:500px; padding:20px;'>\n");
-    print ("<tr><td style='text-align:center; font-weight:bold; font-size:20px;'>Eliminar coches de la base de datos</td></tr>\n");
+    print ("<tr><td style='text-align:center; font-weight:bold; font-size:20px;'>Devolver alquiler coches</td></tr>\n");
     print ("<tr><td style='vertical-align:top;'>\n");
 
-    $instruccion = "SELECT * FROM $nombreTabla WHERE 1=1 ";
     if ($usuario) {
-        $instruccion .= "AND id_usuario_vendedor = " . intval($usuario['id_usuario']) . " ";
+        $usuario_id = intval($usuario['id_usuario']);
+        $instruccion = "SELECT coches.* FROM coches 
+                        INNER JOIN alquileres ON coches.id_coche = alquileres.id_coche 
+                        WHERE coches.alquilado <> '0'
+                        AND alquileres.id_usuario = $usuario_id";
+    } else {
+        $instruccion = "SELECT coches.* FROM coches 
+                        INNER JOIN alquileres ON coches.id_coche = alquileres.id_coche 
+                        WHERE coches.alquilado <> '0'";
     }
 
     $consulta = mysqli_query($conexion, $instruccion);
-
     if (!$consulta) {
         die("Fallo en la consulta: " . mysqli_error($conexion));
     }
@@ -319,10 +326,10 @@ nav ul li ul a {
         }
         print ("</table>\n");
         print("<br>");
-        print("<input type='submit' name='borrar' value='Borrar' style='margin-left:10px; background-color:#333; color:white; border:none; padding:5px 10px; cursor:pointer;' />");
+        print("<input type='submit' name='alquilar' value='Devolver Alquiler' style='margin-left:10px; background-color:#333; color:white; border:none; padding:5px 10px; cursor:pointer;' />");
         print("</form>");
     } else {
-        print ("No hay coches disponibles.");
+        print ("No hay coches disponibles con esos criterios.");
     }
 
     print ("</td></tr>\n");

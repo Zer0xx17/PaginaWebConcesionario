@@ -146,21 +146,25 @@ nav {
             <li>
                 <a href="#">COCHES</a>
                 <ul>
-                <li><a href=" ../../index.php">Inicio</a></li>
-                    <?php if ($usuario && (esTipo($usuario, 'administrador') || esTipo($usuario, 'vendedor'))): ?>
-                        <li><a href="../../submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
-                        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
-                        <li><a href="../../submenus/coches/ModificarCoches.php">Modificar</a></li>
-                        <li><a href="../../submenus/coches/BorrarCoches.php">Borrar</a></li>
-                    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
-                        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
-                    <?php else: ?>
-                        <!-- Opciones para usuarios no autenticados -->
-                        <li><a href="submenus/coches/ListarCoches.php">Listar</a></li>
-                        <li><a href="submenus/coches/BuscarCoches.php">Buscar</a></li>
-                    <?php endif; ?>
+    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
+        <li><a href="../../submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
+        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
+        <li><a href="../../submenus/coches/ModificarCoches.php">Modificar</a></li>
+        <li><a href="../../submenus/coches/BorrarCoches.php">Borrar</a></li>
+    <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
+        <li><a href="../../submenus/coches/AñadirCoches.php">Añadir alquileres</a></li>
+        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
+        <li><a href="../../submenus/coches/ModificarCoches.php">Modificar</a></li>
+    <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
+        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
+    <?php else: ?>
+        <!-- Opciones para usuarios no autenticados -->
+        <li><a href="../../submenus/coches/ListarCoches.php">Listar</a></li>
+        <li><a href="../../submenus/coches/BuscarCoches.php">Buscar</a></li>
+    <?php endif; ?>
                 </ul>   
             </li>
             <!-- Menú USUARIOS -->
@@ -183,12 +187,20 @@ nav {
             <li>
                 <a href="#">ALQUILERES</a>
                 <ul>
-                <li><a href=" ../../index.php">Inicio</a></li>
-                    <?php if ($usuario): ?>
+                    <li><a href="../../index.php">Inicio</a></li>
+                        
+                    <?php if ($usuario && esTipo($usuario, 'administrador')): ?>
                         <li><a href="../alquileres/ListarAlquiler.php">Listar</a></li>
                         <li><a href="../alquileres/BorrarAlquiler.php">Borrar</a></li>
-                    <?php else: ?>
-                        <li><span>Inicia sesión para acceder a este apartado</span></li>
+                        <li><a href="../alquileres/DevolverAlquiler.php">Devolver Alquiler</a></li>
+                            <?php elseif ($usuario && esTipo($usuario, 'vendedor')): ?>
+                        <li><a href="../alquileres/ListarAlquiler.php">Listar</a></li>
+                        <li><a href="../alquileres/BorrarAlquiler.php">Borrar</a></li>
+                            <?php elseif ($usuario && esTipo($usuario, 'comprador')): ?>
+                        <li><a href="../alquileres/ListarAlquiler.php">Listar</a></li>
+                        <li><a href="../alquileres/DevolverAlquiler.php">Devolver Alquiler</a></li>
+                            <?php else: ?>
+                                <li><span>Inicia sesión para acceder a este apartado</span></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -412,4 +424,3 @@ mysqli_close($conexion);
 
 </body>
 </html>
-
